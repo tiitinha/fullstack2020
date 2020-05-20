@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
-import axios from 'axios'
+import personsService from './services/persons'
 
 const App = () => {
 
@@ -16,34 +16,45 @@ const App = () => {
 
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personsService.getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
-  console.log(persons)
-
   const addPerson = (event) => {
     event.preventDefault()
+
+    const newPerson = persons.find(p => p.name === newName)
 
     const phonebookObject = {
       name: newName,
       number: newNumber
     }
 
-    if (!persons.map(person => person.name).includes(newName)) {
-      setPersons(persons.concat(phonebookObject))
-      setNewName('')
-      setNewNumber('')
+    if (newPerson == null) {
+      personsService
+        .create(phonebookObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
+        .catch(error => {
+          alert(
+            `ERROR! Cannot add ${phonebookObject.name}`
+          )
+        })
     } else {
-      window.alert(`${newName} is aldeady added to phonebook`)
+      if (window.confirm(`${newName} is already in the phonebook. Do you want to replace the old number with the new one?`)) {
+        personsService
+          .replace(phonebookObject, newPerson.id)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== newPerson.id ? person : returnedPerson))
+          })
+      }
     }
   }
-
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -56,6 +67,17 @@ const App = () => {
   const handleFilterChange = (event) => [
     setFilterValue(event.target.value)
   ]
+
+  const handleDeleteClick = (event) => {
+    if (window.confirm(`Delete ${event.target.name}?`)) {
+      const removedPerson = persons.find(p => p.name === event.target.name)
+      personsService
+        .remove(event.target.id)
+        .then(
+          setPersons(persons.filter(p => p !== removedPerson))
+        )
+    }
+  }
   
 
   return (
@@ -71,7 +93,7 @@ const App = () => {
           handleNumberChange={handleNumberChange}
         />
       <h2>Numbers</h2>
-        <Persons persons={persons} filterValue={filterValue}/>
+        <Persons persons={persons} filterValue={filterValue} handleDelete={handleDeleteClick}/>
     </div>
   )
 
