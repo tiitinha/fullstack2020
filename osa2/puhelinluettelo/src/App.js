@@ -3,6 +3,7 @@ import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import personsService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
 
@@ -13,6 +14,10 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
 
   const [ filterValue, setFilterValue ] = useState('')
+
+  const [ message, setMessage ] = useState(null)
+
+  const [ error, setError ] = useState(false)
 
 
   useEffect(() => {
@@ -39,11 +44,10 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+          putMessage(false, 'added succesfully', newName)
         })
         .catch(error => {
-          alert(
-            `ERROR! Cannot add ${phonebookObject.name}`
-          )
+          putMessage(true, 'has already been removed from the server', newName)
         })
     } else {
       if (window.confirm(`${newName} is already in the phonebook. Do you want to replace the old number with the new one?`)) {
@@ -52,7 +56,11 @@ const App = () => {
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id !== newPerson.id ? person : returnedPerson))
           })
+          .catch(error => {
+            putMessage(true, 'has already been removed', newName)
+          })
       }
+      putMessage(false, 'number updated succesfully', newName)
     }
   }
 
@@ -76,13 +84,24 @@ const App = () => {
         .then(
           setPersons(persons.filter(p => p !== removedPerson))
         )
+        putMessage(false, 'removed succesfully', newName)
     }
   }
   
+  const putMessage = (error, message, name) => {
+    setMessage(
+      `${name} ${message}`
+    )
+    setError(error)
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
+  }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} error={error}/>
       <Filter filterValue={filterValue} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
         <PersonForm 
