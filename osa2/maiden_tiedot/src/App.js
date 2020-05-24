@@ -6,7 +6,6 @@ import Display from './components/Display'
 const App = () => {
 
   const apiKey = process.env.REACT_APP_API_KEY
-  const [filterValue, setFilterValue] = useState('')
   const [countries, setCountries] = useState([])
   const [filteredCountries, setFilteredCountries] = useState([])
 
@@ -19,19 +18,18 @@ const App = () => {
   }, [])
 
   const handleFilterChange = (event) => {
-    setFilterValue(event.target.value)
-    setFilteredCountries(countries.filter(country => country.name.toLowerCase().includes(filterValue)))
+    const filter = event.target.value
+    setFilteredCountries(countries.filter(country => country.name.toLowerCase().includes(filter)))
   }
 
   const handleClick = (event) => {
-    setFilterValue(event.target.value)
-    setFilteredCountries(countries.filter(country => country.name.toLowerCase() === (event.target.value.toLowerCase())))
+    const filter = event.target.value
+    setFilteredCountries(countries.filter(country => country.name.toLowerCase() === (filter.toLowerCase())))
   }
 
   return (
     <div>
       <Filter 
-        filterValue={filterValue}
         handleFilterChange={handleFilterChange}
       />
       <Display

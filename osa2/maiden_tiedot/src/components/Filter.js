@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Filter = ({filterValue, handleFilterChange}) => {
+const Filter = ({handleFilterChange}) => {
     return (
         <>
-            Find countries <input value={filterValue} onChange={handleFilterChange}/>
+            Find countries <input onChange={handleFilterChange}/>
         </>
     )
 }

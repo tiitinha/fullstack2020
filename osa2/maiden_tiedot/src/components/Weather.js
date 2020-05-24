@@ -9,8 +9,6 @@ const Weather = ({city, apiKey}) => {
         axios
           .get(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
           .then(response => {
-              console.log(response.data.main.temp)
-              console.log(response.data.wind.speed)
               setCityWeather(response.data)
           })
         }, [city, apiKey])
@@ -21,6 +19,8 @@ const Weather = ({city, apiKey}) => {
                 <h3>{city} weather</h3>
                 <p>Temperature: {cityWeather.main.temp} C </p>
                 <p> Wind: {cityWeather.wind.speed} m/s </p>
+                <p>{cityWeather.weather[0].main}, {cityWeather.weather[0].description}</p>
+                <img src={`http://openweathermap.org/img/wn/${cityWeather.weather[0].icon}@2x.png`} alt={city}/>
             </div>
         )
     } else {
