@@ -1,7 +1,7 @@
-POST https://obscure-mesa-19285.herokuapp.com/api/persons
+POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "Testi nimi",
-    "number": "123-123"
+    "name": "Testi nimi2",
+    "number": "123-1234"
 }   

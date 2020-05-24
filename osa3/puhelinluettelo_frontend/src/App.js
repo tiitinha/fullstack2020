@@ -40,21 +40,21 @@ const App = () => {
     if (newPerson == null) {
       personsService
         .create(phonebookObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
+        .then(createdPerson => {
+          setPersons(persons.concat(createdPerson))
           setNewName('')
           setNewNumber('')
           putMessage(false, 'added succesfully', newName)
         })
         .catch(error => {
-          putMessage(true, 'has already been removed from the server', newName)
+          putBackendMessage(error.response.data.error)
         })
     } else {
       if (window.confirm(`${newName} is already in the phonebook. Do you want to replace the old number with the new one?`)) {
         personsService
           .replace(phonebookObject, newPerson.id)
-          .then(returnedPerson => {
-            setPersons(persons.map(person => person.id !== newPerson.id ? person : returnedPerson))
+          .then(createdPerson => {
+            setPersons(persons.map(person => person.id !== newPerson.id ? person : createdPerson))
           })
           .catch(error => {
             putMessage(true, 'has already been removed', newName)
@@ -93,6 +93,16 @@ const App = () => {
       `${name} ${message}`
     )
     setError(error)
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
+  }
+
+  const putBackendMessage = (message) => {
+    setMessage(
+      `${message}`
+    )
+    setError(true)
     setTimeout(() => {
       setMessage(null)
     }, 2000)
