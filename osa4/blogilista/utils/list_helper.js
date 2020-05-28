@@ -13,12 +13,48 @@ const favoriteBlog = (blogs) => {
         .map(blog => blog.likes)
         .reduce((a, b) => Math.max(a,b))
 
-    console.log(blogs.find(blog => blog.likes === maxValue))
     return blogs.find(blog => blog.likes === maxValue)
+}
+
+const mostBlogs = (blogs) => {
+    const occurrencies = blogs
+        .map(blog => blog.author)
+        .reduce((memo, author) => {
+            memo[author] = (memo[author] + 1) || 1
+            return memo
+        }, {})
+
+    const mostOccurencies = Object.keys(occurrencies)
+        .reduce((highest, current) =>
+            occurrencies[highest] > occurrencies[current]
+                ? highest
+                : current
+        )
+
+    return { author: mostOccurencies, blogs: occurrencies[mostOccurencies] }
+}
+
+const mostLikes = (blogs) => {
+    const likes = blogs
+        .reduce((memo, blog) => {
+            memo[blog.author] = (memo[blog.author] + blog.likes) || blog.likes
+            return memo
+        }, {})
+
+    const authorMostLikes = Object.keys(likes)
+        .reduce((highest, current) =>
+            likes[highest] > likes[current]
+                ? highest
+                : current
+        )
+
+    return { author: authorMostLikes, likes: likes[authorMostLikes] }
 }
 
 module.exports = {
     dummy,
     totalLikes,
-    favoriteBlog
+    favoriteBlog,
+    mostBlogs,
+    mostLikes
 }
