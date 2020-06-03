@@ -3,13 +3,15 @@ const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
+//const User = require('../models/user')
 
 const api = supertest(app)
 
 describe('with initial blogs', () => {
     beforeEach(async () => {
-        await Blog.deleteMany()
+        await Blog.deleteMany({})
         await Blog.insertMany(helper.initialBlogs)
+
     })
 
     test('blogs are returned as json', async () => {
@@ -75,6 +77,10 @@ describe('with initial blogs', () => {
 })
 
 describe('addition of a new blog', () => {
+    beforeEach(async () => {
+        await Blog.deleteMany()
+    })
+
     test('likes zero if no value given', async () => {
         const newBlog = {
             title: 'uusi blogi 2',
