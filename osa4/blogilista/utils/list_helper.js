@@ -36,9 +36,9 @@ const mostBlogs = (blogs) => {
 
 const mostLikes = (blogs) => {
     const likes = blogs
-        .reduce((memo, blog) => {
-            memo[blog.author] = (memo[blog.author] + blog.likes) || blog.likes
-            return memo
+        .reduce((blogs, blog) => {
+            blogs[blog.author] = (blogs[blog.author] + blog.likes) || blog.likes
+            return blogs
         }, {})
 
     const authorMostLikes = Object.keys(likes)
