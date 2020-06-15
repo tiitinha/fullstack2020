@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3RpdXNlcjIxIiwiaWQiOiI1ZWRkMDI1YTE1MjU5ZTQ5NThiNzI5MzYiLCJpYXQiOjE1OTE1NDY3MjB9.1ZqK3EPaAcBVCbnHYw4jVmRCY0ucp5Oc2csHVbtDRe0
+
+{
+  "title": "Otsiko223",
+  "author": "Minä",
+  "url": "google.fi",
+  "likes": 78,
+  "user": "Testiuser21"
+}
