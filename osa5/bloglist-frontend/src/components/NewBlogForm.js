@@ -1,38 +1,70 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const NewBlogForm = ({ handleCreation, title, titleChange, author, authorChange, url, urlChange }) => {
+const NewBlogForm = ({ handleCreation }) => {
+    const [title, setTitle] = useState('')
+    const [author, setAuthor] = useState('')
+    const [url, setUrl] = useState('')
+
+    const handleTitleChange = (event) => {
+        setTitle(event.target.value)
+    }
+
+    const handleAuthorChange = (event) => {
+        setAuthor(event.target.value)
+    }
+
+    const handleUrlChange = (event) => {
+        setUrl(event.target.value)
+    }
+
+    const addBlog = (event) => {
+        event.preventDefault()
+        handleCreation({
+            author: author,
+            title: title,
+            url: url
+        })
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+    }
+
+
     return (
         <>
-            <h1>log in to application</h1>
-            <form onSubmit={handleCreation}>
+            <h1>Create a new blog</h1>
+            <form onSubmit={addBlog}>
                 <div>
                     title
-                <input
+                    <input
+                        id="title"
                         type="text"
                         value={title}
                         name="Title"
-                        onChange={titleChange}
+                        onChange={handleTitleChange}
                     />
                 </div>
                 <div>
                     author
-                <input
+                    <input
+                        id="author"
                         type="text"
                         value={author}
                         name="Author"
-                        onChange={authorChange}
+                        onChange={handleAuthorChange}
                     />
                 </div>
                 <div>
                     url
                     <input
+                        id="url"
                         type="text"
                         value={url}
                         name="Url"
-                        onChange={urlChange}
+                        onChange={handleUrlChange}
                     />
                 </div>
-                <button type="submit">create</button>
+                <button id='create-button' type="submit">Create</button>
             </form>
         </>
     )
