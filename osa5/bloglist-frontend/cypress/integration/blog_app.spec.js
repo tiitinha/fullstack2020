@@ -66,7 +66,7 @@ describe('Blog', function () {
                 .should('contain', 'undefined a new blog title by testjim added')
         })
 
-        describe.only('and when a blog exists', function () {
+        describe('and when a blog exists', function () {
             beforeEach(function () {
                 cy.createBlog({
                     title: 'title1',
@@ -84,7 +84,7 @@ describe('Blog', function () {
 
         })
 
-        describe.only('and multiple blogs exist', function () {
+        describe('and multiple blogs exist', function () {
             beforeEach(function () {
                 for (let i = 0; i < 10; i++) {
                     cy.createBlog({
@@ -97,9 +97,6 @@ describe('Blog', function () {
             })
 
             it('blogs are ordered by likes', function () {
-                // get all blogs and .each to check that
-                // current has more likes than prevonly
-                let prevLikes = 0
 
                 cy.get('.blog')
                     .each(($el, index) => {
