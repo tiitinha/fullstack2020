@@ -1,3 +1,5 @@
+var timeoutId = null
+
 export const setNotification = (message, time) => {
     return async dispatch => {
         dispatch({
@@ -5,11 +7,12 @@ export const setNotification = (message, time) => {
             data: message
         })
 
-        await setTimeout(() => {
+        await clearTimeout(timeoutId)
+        timeoutId = await setTimeout(() => {
             dispatch({
                 type: 'REMOVE_NOTIFICATION'
             })
-        }, 5000)
+        }, time * 1000)
     }
 }
 
@@ -18,9 +21,7 @@ export const removeNotification = () => {
         type: 'REMOVE_NOTIFICATION',
     }
 }
-
-
-const notificationReducer = (state = '', action) => {
+ const notificationReducer = (state = '', action) => {
     switch (action.type) {
         case 'SET_NOTIFICATION':
             return action.data
