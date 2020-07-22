@@ -1,6 +1,6 @@
 import Notification from './Notification'
 import React, { useState } from 'react'
-import Notification from './Notification'
+import { useHistory } from 'react-router-dom'
 
 const Login = () => {
 

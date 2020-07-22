@@ -16,11 +16,6 @@ export const setNotification = (message, time) => {
     }
 }
 
-export const removeNotification = () => {
-    return {
-        type: 'REMOVE_NOTIFICATION',
-    }
-}
  const notificationReducer = (state = '', action) => {
     switch (action.type) {
         case 'SET_NOTIFICATION':

@@ -1,19 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 const Blog = ({ blog }) => {
 
-    const blogStyle = {
-        paddingTop: 10,
-        paddingLeft: 2,
-        border: 'solid',
-        borderWidth: 1,
-        marginBottom: 5
+    let blogStyle
+    const [hover, setHover] = useState(false)
+
+    const toggleHover = () => {
+        setHover(!hover)
+    }
+
+
+    const history = useHistory()
+
+    if (hover) {
+        blogStyle = {
+            paddingTop: 11,
+            paddingLeft: 2,
+            marginBottom: 6,
+            backgroundColor: 'lightblue'
+        }
+    } else {
+        blogStyle = {
+            paddingTop: 10,
+            paddingLeft: 2,
+            border: 'solid',
+            borderWidth: 1,
+            marginBottom: 5
+        }
     }
 
     return (
-        <div style={blogStyle} className='blog'>
+        <div onClick={() => history.push(`/blogs/${blog.id}`)} style={blogStyle} className='blog' onMouseEnter={toggleHover} onMouseLeave={toggleHover}>
             <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
         </div>
     )

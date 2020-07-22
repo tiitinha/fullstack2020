@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     BrowserRouter as Router,
-    Switch, Route, Link, padding
+    Switch, Route, Link
 } from 'react-router-dom'
 
 
@@ -14,7 +14,6 @@ import Users from './components/Users'
 import User from './components/User'
 import BlogPage from './components/BlogPage'
 
-import loginService from './services/login'
 import storage from './utils/storage'
 
 
