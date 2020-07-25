@@ -133,13 +133,16 @@ const resolvers = {
             }
             return returnedBooks
         },
-        allAuthors: () => authors
+        allAuthors: () => authors,
+        findAuthor: (root, args) =>
+            authos.find(a => a.name === args.name)
     },
     Author: {
         bookCount: (root) => books.filter(book => book.author === root.name).length
     },
     Mutation: {
         addBook: (root, args) => {
+            console.log(args)
             const book = { ...args, id: uuid() }
             books = books.concat(book)
 
