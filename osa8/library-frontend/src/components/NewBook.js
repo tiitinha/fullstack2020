@@ -1,17 +1,27 @@
 import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
-import { CREATE_BOOK } from '../queries'
+import { CREATE_BOOK, ALL_BOOKS } from '../queries'
 
 const NewBook = (props) => {
     const [title, setTitle] = useState('')
-    const [author, setAuhtor] = useState('')
+    const [author, setAuthor] = useState('')
     const [published, setPublished] = useState('')
     const [genre, setGenre] = useState('')
     const [genres, setGenres] = useState([])
 
-    const [ createBook ] = useMutation(CREATE_BOOK, {
+    const [createBook] = useMutation(CREATE_BOOK, {
         onError: (error) => {
             console.log(error.graphQLErrors[0])
+        },
+        update: (store, response) => {
+            const dataInStore = store.readQuery({ query: ALL_BOOKS })
+            store.writeQuery({
+                query: ALL_BOOKS,
+                data: {
+                    ...dataInStore,
+                    allBooks: [ ...dataInStore.allBooks, response.data.CreateBook ]
+                }
+            })
         }
     })
 
@@ -27,7 +37,7 @@ const NewBook = (props) => {
 
         setTitle('')
         setPublished('')
-        setAuhtor('')
+        setAuthor('')
         setGenres([])
         setGenre('')
     }
@@ -51,7 +61,7 @@ const NewBook = (props) => {
                     author
           <input
                         value={author}
-                        onChange={({ target }) => setAuhtor(target.value)}
+                        onChange={({ target }) => setAuthor(target.value)}
                     />
                 </div>
                 <div>

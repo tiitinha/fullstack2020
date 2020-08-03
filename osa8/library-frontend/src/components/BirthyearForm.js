@@ -17,7 +17,6 @@ const BirthyearForm = ({ authors }) => {
 
     const submit = (event) => {
         event.preventDefault()
-
         updateAuthor({ variables: { name, setBornTo: parseInt(born) } })
 
         setName('')

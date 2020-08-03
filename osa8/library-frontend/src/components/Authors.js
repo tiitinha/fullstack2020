@@ -13,7 +13,7 @@ const Authors = (props) => {
             <div>loading</div>
         )
     }
-
+    
     const authors = result.data.allAuthors
 
     if (!props.show) {
@@ -44,7 +44,10 @@ const Authors = (props) => {
                     )}
                 </tbody>
             </table>
-            <BirthyearForm authors={authors} />
+            {localStorage.getItem('book-user-token') === null
+                ? null
+                : <BirthyearForm authors={authors} />
+            }
         </div>
     )
 }
