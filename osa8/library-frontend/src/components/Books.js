@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { ALL_BOOKS, ALL_GENRES } from '../queries'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 
 const Books = (props) => {
 
@@ -8,7 +8,7 @@ const Books = (props) => {
     const [books, setBooks] = useState([])
     const [genres, setGenres] = useState([])
     const [getBooks, result] = useLazyQuery(ALL_BOOKS)
-    const result2 = useQuery(ALL_GENRES)
+    const [getGenres, result2] = useLazyQuery(ALL_GENRES)
 
     useEffect(() => {
         if (result.data) {
@@ -16,14 +16,17 @@ const Books = (props) => {
             setBooks(newBooks)
         }
         if (result2.data) {
-            console.log(result2)
-            const allBooks = result2.data.allBooks
-            setGenres([].concat.apply([], allBooks.map(book => book.genres)))
+            const allGenres = result2.data.allGenres
+            setGenres(allGenres)
         }
     }, [result, result2]) // eslint-disable-line
 
     if (!result.called) {
         getBooks()
+    }
+
+    if (!result2.called) {
+        getGenres()
     }
 
     if (!props.show) {

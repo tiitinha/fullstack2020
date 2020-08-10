@@ -5,13 +5,39 @@ import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Login from './components/Login'
 import Recommend from './components/Recommend'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { BOOK_ADDED, ALL_BOOKS } from './queries'
 
 
 const App = () => {
     const [page, setPage] = useState('authors')
     const [user, setUser] = useState(null)
     const client = useApolloClient()
+
+    const updateCacheWith = (addedBook) => {
+        const includedIn = (set, object) => {
+            set.map(b => b.id).includes(object.id)
+        }
+
+        const dataInStore = client.readQuery({ query: ALL_BOOKS })
+
+        if (!includedIn(dataInStore.allBooks, addedBook)) {
+
+            client.writeQuery({
+                query: ALL_BOOKS,
+                data: { allBooks: dataInStore.allBooks.concat(addedBook) }
+            })
+        }
+
+    }
+
+    useSubscription(BOOK_ADDED, {
+        onSubscriptionData: ({ subscriptionData }) => {
+            const addedBook = subscriptionData.data.bookAdded
+            window.alert(`${addedBook.title} by ${addedBook.author.name} added`)
+            updateCacheWith(addedBook)
+        }
+    })
 
     const logout = () => {
         setUser(null)
@@ -34,7 +60,7 @@ const App = () => {
                 <button onClick={() => setPage('recommend')}>recommend</button>
             </div>
 
-            {user 
+            {user
                 ? <div>{user.username} logged in</div>
                 : null}
             <Authors
@@ -47,6 +73,7 @@ const App = () => {
 
             <NewBook
                 show={page === 'add'}
+                updateCacheWith={updateCacheWith}
             />
 
             <Login
@@ -54,7 +81,7 @@ const App = () => {
                 setUser={setUser}
                 setPage={setPage}
             />
-            <Recommend 
+            <Recommend
                 show={page === 'recommend'}
                 favoriteGenre={user ? user.favoriteGenre : null}
             />

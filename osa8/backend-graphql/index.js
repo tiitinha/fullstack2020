@@ -3,9 +3,15 @@ const { v1: uuid } = require('uuid')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const { PubSub } = require('apollo-server')
+const pubsub = new PubSub()
+const DataLoader = require('dataloader')
+
 const Author = require('./models/Author')
 const Book = require('./models/Book')
 const User = require('./models/User')
+
+// config
 
 const JWT_SECRET = 'hooj_sekred'
 
@@ -49,10 +55,15 @@ const typeDefs = gql`
         value: String!
     }
 
+    type Subscription {
+        bookAdded: Book!
+      }    
+
     type Query {
         bookCount: Int!
         authorCount: Int!
         allBooks(author: String, genres: [String]): [Book!]!
+        allGenres: [String!]!
         findAuthor(author: String!): Author!
         allAuthors: [Author!]!
         me: User
@@ -87,7 +98,6 @@ const typeDefs = gql`
 const resolvers = {
     Query: {
         bookCount: () => Book.collection.countDocuments,
-        authorCount: () => Author.collection.countDocuments(),
         allBooks: async (root, args) => {
 
             if (Object.keys(args).length !== 0) {
@@ -111,23 +121,36 @@ const resolvers = {
         },
         allAuthors: async () => {
             const authors = await Author.find({})
+
             return authors
+        },
+        allGenres: async () => {
+            const books = await Book.find({})
+
+            const genres = books.flatMap(book => book.genres)
+                .reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], [])
+            return genres
         },
         findAuthor: async (root, args) =>
             await Author.findOne({ name: args.name })
         ,
         me: (root, args, context) => {
-            return context
+            return context.currentUser
         }
     },
     Author: {
-        bookCount: async (root) => {
-            const books = await Book.find({ author: root })
+        bookCount: async (root, args, { loaders }) => {
+            const books = await loaders.book.load(root._id)
             return books.length
         }
     },
     Mutation: {
-        addBook: async (root, args) => {
+        addBook: async (root, args, { currentUser }) => {
+
+            // if (!currentUser) {
+            //     throw new UserInputError('wrong credentials')
+            // }
+
             const author = await Author.findOne({ name: args.author })
             let book
 
@@ -153,9 +176,16 @@ const resolvers = {
                 })
             }
 
+            pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
             return book
         },
-        editAuthor: async (root, args, context) => {
+        editAuthor: async (root, args, { currentUser }) => {
+
+            if (!currentUser) {
+                throw new UserInputError('wrong credentials')
+            }
+
             const author = await Author.findOne({ name: args.name })
 
             if (!author) {
@@ -203,9 +233,22 @@ const resolvers = {
 
             return { value: jwt.sign(userForToken, JWT_SECRET) }
         }
-    }
+    },
+    Subscription: {
+        bookAdded: {
+            subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+        },
+    },
 }
 
+const batchBooks = async (keys) => {
+    const books = await Book.find({ author: { $in: keys } })
+
+    const returnedBooks = keys.map(key => books.filter(book => String(book.author._id) === String(key)))
+    return returnedBooks
+}
+
+const bookLoader = new DataLoader(keys => batchBooks(keys))
 
 const server = new ApolloServer({
     typeDefs,
@@ -221,11 +264,24 @@ const server = new ApolloServer({
             const currentUser = await User
                 .findById(decodedToken.id)
 
-            return currentUser
+            return {
+                currentUser,
+                loaders: {
+                    book: bookLoader
+                }
+            }
+        }
+
+        return {
+            loaders: {
+                book: bookLoader
+            }
         }
     }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
     console.log(`Server ready at ${url}`)
+    console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
+
