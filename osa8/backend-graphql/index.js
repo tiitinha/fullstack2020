@@ -147,9 +147,9 @@ const resolvers = {
     Mutation: {
         addBook: async (root, args, { currentUser }) => {
 
-            // if (!currentUser) {
-            //     throw new UserInputError('wrong credentials')
-            // }
+            if (!currentUser) {
+                throw new UserInputError('wrong credentials')
+            }
 
             const author = await Author.findOne({ name: args.author })
             let book

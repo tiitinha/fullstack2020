@@ -6,7 +6,7 @@ import NewBook from './components/NewBook'
 import Login from './components/Login'
 import Recommend from './components/Recommend'
 import { useApolloClient, useSubscription } from '@apollo/client'
-import { BOOK_ADDED, ALL_BOOKS } from './queries'
+import { BOOK_ADDED, ALL_BOOKS, ALL_AUTHORS, ALL_GENRES } from './queries'
 
 
 const App = () => {
@@ -31,11 +31,42 @@ const App = () => {
 
     }
 
+    const updateCacheAuthors = (addedBook) => {
+        const includedIn = (set, object) => {
+            set.map(a => a.name).includes(object.author.name)
+        }
+
+        const authorsInStore = client.readQuery({ query: ALL_AUTHORS })
+
+        if (!includedIn(authorsInStore.allAuthors, addedBook)) {
+            client.writeQuery({
+                query: ALL_AUTHORS,
+                data: { allAuthors: authorsInStore.allAuthors.concat(addedBook.author) }
+            })
+        } else {
+            client.writeQuery({
+                query: ALL_AUTHORS,
+                data: { allAuthors: authorsInStore.allAuthors.map(author => author.name === addedBook.author.name ? { ...author, bookCount: author.bookCount + 1 } : author) }
+            })
+        }
+    }
+
+    const updateCacheGenres = (addedBook) => {
+        const genresInStore = client.readQuery({ query: ALL_GENRES })
+
+        client.writeQuery({
+            query: ALL_GENRES,
+            data: { allGenres: [...new Set(genresInStore.allGenres.concat(addedBook.genres))] }
+        })
+    }
+
     useSubscription(BOOK_ADDED, {
         onSubscriptionData: ({ subscriptionData }) => {
             const addedBook = subscriptionData.data.bookAdded
             window.alert(`${addedBook.title} by ${addedBook.author.name} added`)
             updateCacheWith(addedBook)
+            updateCacheAuthors(addedBook)
+            updateCacheGenres(addedBook)
         }
     })
 
