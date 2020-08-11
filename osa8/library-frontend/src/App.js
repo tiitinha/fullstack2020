@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -13,6 +13,9 @@ const App = () => {
     const [page, setPage] = useState('authors')
     const [user, setUser] = useState(null)
     const client = useApolloClient()
+
+    useEffect(() => {
+    }, [user])
 
     const updateCacheWith = (addedBook) => {
         const includedIn = (set, object) => {
