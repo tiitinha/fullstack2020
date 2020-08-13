@@ -32,9 +32,9 @@ export const calculateBmi = (height: number, weight: number): string => {
     } else if (bmi >= 30) {
         return 'Very high (obese)';
     } else {
-        return 'What??'
+        return 'What??';
     }
-}
+};
 
 // try {
 //     const { value1, value2 } = parseArguments(process.argv);
