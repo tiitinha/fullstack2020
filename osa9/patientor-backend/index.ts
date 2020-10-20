@@ -20,6 +20,16 @@ app.get('/api/patients', (_req, res) => {
     res.status(200).send(patientService.getPatients());
 });
 
+app.get('/api/patients/:id', (req, res) => {
+    const patient = patientService.getPatient(req.params.id);
+
+    if (!patient) {
+        res.status(404);
+    } else {
+        res.status(200).send(patient);
+    }
+});
+
 app.get('/api/diagnoses', (_req, res) => {
     res.status(200).send(diagnosisService.getDiagnoses());
 });
